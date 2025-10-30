@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { IdeaForm } from './components/IdeaForm';
 import { LoadingSpinner } from './components/icons/LoadingSpinner';
 import { IdeaFormData } from './types';
 import { generateStartupImages, generateStartupVideo } from './services/geminiService';
 import { MediaResults } from './components/MediaResults';
-import { SelectKeyPrompt } from './components/SelectKeyPrompt';
 
 function App() {
   const [images, setImages] = useState<string[]>([]);
@@ -13,18 +12,8 @@ function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [videoStatus, setVideoStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isKeyReady, setIsKeyReady] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [currentFormData, setCurrentFormData] = useState<IdeaFormData | null>(null);
-
-  useEffect(() => {
-    const checkKey = async () => {
-      if (window.aistudio && await window.aistudio.hasSelectedApiKey()) {
-        setIsKeyReady(true);
-      }
-    };
-    checkKey();
-  }, []);
 
   const handleGenerate = async (formData: IdeaFormData) => {
     setIsLoading(true);
@@ -51,10 +40,7 @@ function App() {
       // Refined API Key Error Handling
       if (err.message && err.message.includes("Requested entity was not found")) {
         // This specific error message from the API often indicates an invalid API key.
-        // We provide a more user-friendly message and reset the state to prompt for a new key.
-        errorMessage = "There was a problem with your API key. It may be invalid, expired, or lack the necessary permissions. Please select a different key and try again.";
-        setIsKeyReady(false); // Force re-selection of the key.
-        setShowResults(false); // Hide the results/loading screen.
+        errorMessage = "There was a problem with your API key. It may be invalid, expired, or lack the necessary permissions. Please check your environment configuration.";
       } else if (errorMessage.includes("did not return any images")) {
         errorMessage = "The AI couldn't generate images based on your inputs. Try rephrasing your industry or target audience for better results.";
       } else if (errorMessage.includes("no download link was found")) {
@@ -87,11 +73,6 @@ function App() {
     setCurrentFormData(null);
   }
   
-  const handleKeySelected = () => {
-    setIsKeyReady(true);
-    setError(null); // Clear any previous API key errors after a new key is selected.
-  }
-
   const renderContent = () => {
     if (showResults) {
       if (isLoading || videoStatus) {
@@ -128,14 +109,6 @@ function App() {
         </div>
       </>
     )
-  }
-
-  if (!isKeyReady) {
-    return (
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        <SelectKeyPrompt onKeySelected={handleKeySelected} />
-      </div>
-    );
   }
 
   return (
