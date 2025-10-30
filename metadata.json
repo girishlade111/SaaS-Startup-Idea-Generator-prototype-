@@ -1,0 +1,5 @@
+{
+  "name": "SaaS Startup Idea Generator",
+  "description": "An AI-based web application that generates creative, validated, and market-ready SaaS startup ideas based on user inputs such as industry, target audience, tech stack, and monetization preferences.",
+  "requestFramePermissions": []
+}
