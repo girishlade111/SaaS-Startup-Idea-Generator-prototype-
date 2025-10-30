@@ -48,10 +48,13 @@ function App() {
     } catch (err: any) {
       let errorMessage = err.message || "An unexpected error occurred.";
       
-      if (errorMessage.includes("Requested entity was not found")) {
-        errorMessage = "Your API key appears to be invalid or lacks the necessary permissions. Please select a valid key and try again.";
-        setIsKeyReady(false); // Reset key state to force re-selection
-        setShowResults(false);
+      // Refined API Key Error Handling
+      if (err.message && err.message.includes("Requested entity was not found")) {
+        // This specific error message from the API often indicates an invalid API key.
+        // We provide a more user-friendly message and reset the state to prompt for a new key.
+        errorMessage = "There was a problem with your API key. It may be invalid, expired, or lack the necessary permissions. Please select a different key and try again.";
+        setIsKeyReady(false); // Force re-selection of the key.
+        setShowResults(false); // Hide the results/loading screen.
       } else if (errorMessage.includes("did not return any images")) {
         errorMessage = "The AI couldn't generate images based on your inputs. Try rephrasing your industry or target audience for better results.";
       } else if (errorMessage.includes("no download link was found")) {
@@ -86,6 +89,7 @@ function App() {
   
   const handleKeySelected = () => {
     setIsKeyReady(true);
+    setError(null); // Clear any previous API key errors after a new key is selected.
   }
 
   const renderContent = () => {

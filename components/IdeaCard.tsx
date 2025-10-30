@@ -7,6 +7,8 @@ import { DollarSignIcon } from './icons/DollarSignIcon';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
 import { TrophyIcon } from './icons/TrophyIcon';
 import { BrainCircuitIcon } from './icons/BrainCircuitIcon';
+import { ThumbsUpIcon } from './icons/ThumbsUpIcon';
+import { ThumbsDownIcon } from './icons/ThumbsDownIcon';
 
 interface IdeaCardProps {
   idea: Idea;
@@ -31,8 +33,13 @@ const DetailSection: React.FC<{ icon: React.ReactNode; title: string; children: 
 
 export const IdeaCard: React.FC<IdeaCardProps> = ({ idea }) => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
 
     const scoreColor = idea.marketValidationScore > 75 ? 'text-green-400' : idea.marketValidationScore > 50 ? 'text-yellow-400' : 'text-red-400';
+
+    const handleFeedback = (newFeedback: 'up' | 'down') => {
+      setFeedback(current => (current === newFeedback ? null : newFeedback));
+    };
 
     return (
         <div className="bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-xl p-6 flex flex-col transition-all duration-300 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-900/50">
@@ -76,13 +83,31 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({ idea }) => {
                 )}
             </div>
             
-            <button 
-                onClick={() => setIsExpanded(!isExpanded)} 
-                className="mt-4 w-full text-sm text-blue-400 hover:text-blue-300 font-semibold flex items-center justify-center"
-            >
-                {isExpanded ? 'Show Less' : 'Show More'}
-                <ChevronDownIcon className={`ml-1 h-5 w-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-            </button>
+            <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                    <button 
+                        onClick={() => handleFeedback('up')} 
+                        className="p-2 rounded-full transition-colors duration-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-600"
+                        aria-label="Good idea"
+                    >
+                        <ThumbsUpIcon className={`h-5 w-5 transition-colors ${feedback === 'up' ? 'text-green-400' : 'text-slate-500 hover:text-slate-300'}`} />
+                    </button>
+                    <button 
+                        onClick={() => handleFeedback('down')} 
+                        className="p-2 rounded-full transition-colors duration-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-600"
+                        aria-label="Bad idea"
+                    >
+                        <ThumbsDownIcon className={`h-5 w-5 transition-colors ${feedback === 'down' ? 'text-red-400' : 'text-slate-500 hover:text-slate-300'}`} />
+                    </button>
+                </div>
+                <button 
+                    onClick={() => setIsExpanded(!isExpanded)} 
+                    className="text-sm text-blue-400 hover:text-blue-300 font-semibold flex items-center justify-center"
+                >
+                    {isExpanded ? 'Show Less' : 'Show More'}
+                    <ChevronDownIcon className={`ml-1 h-5 w-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                </button>
+            </div>
         </div>
     );
 };
